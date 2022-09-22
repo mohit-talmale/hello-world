@@ -1,4 +1,4 @@
-<h1>Sammy's Sample HTML</h1>
+<h1>Mohit's app  Sample HTML</h1>
 
 <p>This code is an example of how HTML is written.</p>
 
