@@ -44,29 +44,6 @@ resource "aws_subnet" "web-subnet-2" {
   }
 }
 
-# Create Application Public Subnet
-resource "aws_subnet" "application-subnet-1" {
-  vpc_id                  = aws_vpc.my-vpc.id
-  cidr_block              = "10.0.11.0/24"
-  availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = false
-
-  tags = {
-    Name = "Application-1a"
-  }
-}
-
-resource "aws_subnet" "application-subnet-2" {
-  vpc_id                  = aws_vpc.my-vpc.id
-  cidr_block              = "10.0.12.0/24"
-  availability_zone       = "us-east-1b"
-  map_public_ip_on_launch = false
-
-  tags = {
-    Name = "Application-2b"
-  }
-}
-
 # Create Database Private Subnet
 resource "aws_subnet" "database-subnet-1" {
   vpc_id            = aws_vpc.my-vpc.id
@@ -135,12 +112,12 @@ resource "aws_route_table_association" "b" {
 
 #Create EC2 Instance
 resource "aws_instance" "webserver1" {
-  ami                    = "ami-0d5eff06f840b45e9"
+  ami                    = "ami-026b57f3c383c2eec"
   instance_type          = "t2.micro"
   availability_zone      = "us-east-1a"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-1.id
-  user_data              = file("install_apache.sh")
+  user_data              = file("ec2.sh")
 
   tags = {
     Name = "Web Server"
@@ -149,12 +126,12 @@ resource "aws_instance" "webserver1" {
 }
 
 resource "aws_instance" "webserver2" {
-  ami                    = "ami-0d5eff06f840b45e9"
+  ami                    = "ami-026b57f3c383c2eec"
   instance_type          = "t2.micro"
   availability_zone      = "us-east-1b"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-2.id
-  user_data              = file("install_apache.sh")
+  user_data              = file("ec2.sh")
 
   tags = {
     Name = "Web Server"
@@ -294,8 +271,8 @@ resource "aws_db_instance" "default" {
   instance_class         = "db.t2.micro"
   multi_az               = true
   name                   = "mydb"
-  username               = "username"
-  password               = "password"
+  username               = "admin"
+  password               = "admin"
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.database-sg.id]
 }
