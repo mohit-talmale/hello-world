@@ -1,8 +1,7 @@
 #!/bin/bash
 
-sudo su -
-yum install docker -y
-service docker start
-docker login -u mohit1talmale -p Bunty@171
-docker pull mohit1talmale/demo-project:newtag
-
+yum update -y
+yum install -y httpd.x86_64
+systemctl start httpd.service
+systemctl enable httpd.service
+echo "Hello World from $(hostname -f)" > /var/www/html/index.html
