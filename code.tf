@@ -45,35 +45,35 @@ resource "aws_subnet" "web-subnet-2" {
 }
 
 # Create Database Private Subnet
-resource "aws_subnet" "database-subnet-1" {
-  vpc_id            = aws_vpc.my-vpc.id
-  cidr_block        = "10.0.21.0/24"
-  availability_zone = "us-east-1a"
+# resource "aws_subnet" "database-subnet-1" {
+#   vpc_id            = aws_vpc.my-vpc.id
+#   cidr_block        = "10.0.21.0/24"
+#   availability_zone = "us-east-1a"
 
-  tags = {
-    Name = "Database-1a"
-  }
-}
+#   tags = {
+#     Name = "Database-1a"
+#   }
+# }
 
-resource "aws_subnet" "database-subnet-2" {
-  vpc_id            = aws_vpc.my-vpc.id
-  cidr_block        = "10.0.22.0/24"
-  availability_zone = "us-east-1b"
+# resource "aws_subnet" "database-subnet-2" {
+#   vpc_id            = aws_vpc.my-vpc.id
+#   cidr_block        = "10.0.22.0/24"
+#   availability_zone = "us-east-1b"
 
-  tags = {
-    Name = "Database-2b"
-  }
-}
+#   tags = {
+#     Name = "Database-2b"
+#   }
+# }
 
-resource "aws_subnet" "database-subnet" {
-  vpc_id            = aws_vpc.my-vpc.id
-  cidr_block        = "10.0.3.0/24"
-  availability_zone = "us-east-1a"
+# resource "aws_subnet" "database-subnet" {
+#   vpc_id            = aws_vpc.my-vpc.id
+#   cidr_block        = "10.0.3.0/24"
+#   availability_zone = "us-east-1a"
 
-  tags = {
-    Name = "Database"
-  }
-}
+#   tags = {
+#     Name = "Database"
+#   }
+# }
 
 # Create Internet Gateway
 resource "aws_internet_gateway" "igw" {
@@ -160,6 +160,21 @@ resource "aws_security_group" "web-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "HTTP from VPC"
+    from_port   = 8080
+    to_port     = 8082
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     Name = "Web-SG"
   }
@@ -186,56 +201,71 @@ resource "aws_security_group" "webserver-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+    ingress {
+    description     = "Allow traffic from web layer"
+    from_port       = 8080
+    to_port         = 8082
+    protocol        = "tcp"
+    security_groups = [aws_security_group.web-sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     Name = "Webserver-SG"
   }
 }
 
 # Create Database Security Group
-resource "aws_security_group" "database-sg" {
-  name        = "Database-SG"
-  description = "Allow inbound traffic from application layer"
-  vpc_id      = aws_vpc.my-vpc.id
+# resource "aws_security_group" "database-sg" {
+#   name        = "Database-SG"
+#   description = "Allow inbound traffic from application layer"
+#   vpc_id      = aws_vpc.my-vpc.id
 
-  ingress {
-    description     = "Allow traffic from application layer"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.webserver-sg.id]
-  }
+#   ingress {
+#     description     = "Allow traffic from application layer"
+#     from_port       = 3306
+#     to_port         = 3306
+#     protocol        = "tcp"
+#     security_groups = [aws_security_group.webserver-sg.id]
+#   }
 
-  egress {
-    from_port   = 32768
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+#   egress {
+#     from_port   = 32768
+#     to_port     = 65535
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
-  tags = {
-    Name = "Database-SG"
-  }
-}
+#   tags = {
+#     Name = "Database-SG"
+#   }
+# }
 
 resource "aws_lb" "external-elb" {
   name               = "External-LB"
   internal           = false
-  load_balancer_type = "application"
+  load_balancer_type = "Network"
   security_groups    = [aws_security_group.web-sg.id]
   subnets            = [aws_subnet.web-subnet-1.id, aws_subnet.web-subnet-2.id]
 }
 
 resource "aws_lb_target_group" "external-elb" {
-  name     = "ALB-TG"
-  port     = 80
-  protocol = "HTTP"
+  name     = "NLB-TG"
+  port     = 8082
+  protocol = "tcp"
   vpc_id   = aws_vpc.my-vpc.id
 }
 
 resource "aws_lb_target_group_attachment" "external-elb1" {
   target_group_arn = aws_lb_target_group.external-elb.arn
   target_id        = aws_instance.webserver1.id
-  port             = 80
+  port             = 8082
 
   depends_on = [
     aws_instance.webserver1,
@@ -245,7 +275,7 @@ resource "aws_lb_target_group_attachment" "external-elb1" {
 resource "aws_lb_target_group_attachment" "external-elb2" {
   target_group_arn = aws_lb_target_group.external-elb.arn
   target_id        = aws_instance.webserver2.id
-  port             = 80
+  port             = 8082
 
   depends_on = [
     aws_instance.webserver2,
@@ -254,8 +284,8 @@ resource "aws_lb_target_group_attachment" "external-elb2" {
 
 resource "aws_lb_listener" "external-elb" {
   load_balancer_arn = aws_lb.external-elb.arn
-  port              = "80"
-  protocol          = "HTTP"
+  port              = "8082"
+  protocol          = "tcp"
 
   default_action {
     type             = "forward"

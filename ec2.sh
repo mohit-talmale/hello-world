@@ -1,7 +1,9 @@
 #!/bin/bash
 
+sudo su -
 yum update -y
-yum install -y httpd.x86_64
-systemctl start httpd.service
-systemctl enable httpd.service
-echo "<h2>EC2 running on  $(hostname -f) </h2>" > /var/www/html/index.html
+yum install docker -y
+service docker start
+docker login -u mohit1talmale -p Bunty@171
+docker pull mohit1talmale/demo-project:newtag2
+docker run -d --name myapp_container -p 8082:8080 myapp_image:newtag2
