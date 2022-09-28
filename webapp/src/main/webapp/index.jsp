@@ -28,8 +28,7 @@ Enter your City/town details:
 Enter your family details:
 <input type="text" name="Deptt" size=35 maxlength=35 value=""> </br> </br>
 
-Enter your fathers details:
-<input type="text" name="Deptt" size=35 maxlength=35 value=""> </br> </br>
+
 
 
 
