@@ -22,8 +22,8 @@ Enter your department:
 <input type="text" name="Deptt" size=35 maxlength=35 value=""> </br> </br>
 
 
-<!-- Enter your City details:
-<input type="text" name="Deptt" size=35 maxlength=35 value=""> </br> </br> -->
+Enter your City details:
+<input type="text" name="Deptt" size=35 maxlength=35 value=""> </br> </br>
 
 
 
