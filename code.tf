@@ -117,7 +117,18 @@ resource "aws_instance" "webserver1" {
   availability_zone      = "us-east-1a"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-1.id
-  user_data              = "${file("ec2.sh")}"
+  user_data              = << EOF
+  #!/bin/bash
+
+  sudo su -
+  yum update -y
+  yum install docker -y
+  service docker start
+  docker login -u mohit1talmale -p Bunty@171
+  docker rmi mohit1talmale/demo-project:newtag2
+  docker pull mohit1talmale/demo-project:newtag2
+  docker run -p 80:8080 mohit1talmale/demo-project:newtag2
+  EOF
 
   tags = {
     Name = "Web Server"
@@ -131,7 +142,18 @@ resource "aws_instance" "webserver2" {
   availability_zone      = "us-east-1b"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-2.id
-  user_data              = "${file("ec2.sh")}"
+  user_data              = << EOF
+  #!/bin/bash
+
+  sudo su -
+  yum update -y
+  yum install docker -y
+  service docker start
+  docker login -u mohit1talmale -p Bunty@171
+  docker rmi mohit1talmale/demo-project:newtag2
+  docker pull mohit1talmale/demo-project:newtag2
+  docker run -p 80:8080 mohit1talmale/demo-project:newtag2
+  EOF
 
   tags = {
     Name = "Web Server"
