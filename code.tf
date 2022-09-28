@@ -250,7 +250,7 @@ resource "aws_security_group" "webserver-sg" {
 resource "aws_lb" "external-elb" {
   name               = "External-LB"
   internal           = false
-  load_balancer_type = "Network"
+  load_balancer_type = "network"
   security_groups    = [aws_security_group.web-sg.id]
   subnets            = [aws_subnet.web-subnet-1.id, aws_subnet.web-subnet-2.id]
 }
