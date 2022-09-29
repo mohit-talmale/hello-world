@@ -162,7 +162,7 @@ resource "aws_instance" "webserver2" {
   }
 }
 
-resource "null_resource" "copy_execute" {
+resource "null_resource" "copy_execute1" {
 
   connection {
     type        = "ssh"
