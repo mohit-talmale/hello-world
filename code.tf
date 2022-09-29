@@ -110,19 +110,43 @@ resource "aws_route_table_association" "b" {
   route_table_id = aws_route_table.web-rt.id
 }
 
+
+
 #Create EC2 Instance
+resource "aws_key_pair" "developer" {
+ key_name = "developer"
+ public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCOiMZnuZabyTSdBDdW0wobem48zjj003YuIorn+iIXLp60R8e0yCEMbgXRL3lqkXRW5hd17md0Ge9BeEUcjqei8gvPdXR4YLKAucqQt+PnJZ3LMfbSWUAdIjYyYjRmhOi48RqBPGg+71etwR+EZQtuHCPmXOvReAhcA9fRRM06W+zJxvn7P8R+9ZFAgVYEONGiPcb4iouZIZXK1+lPhkFsHfVvoAlLGMWdJ2wfJdhPpob8S7ZZmt7YfGNgZYd2zBin70kKi3N9XiQKv4ehSQyiMFkNMnHHm2J/g9nEOddgIme1kCRBa2Y70Omk9fK9+dU6rVPc+gLCKg9OrolXvCCT imported-openssh-key"
+}
+
+variable "privatekey" {
+ default = "developer"
+}
+
 resource "aws_instance" "webserver1" {
   ami                    = "ami-026b57f3c383c2eec"
   instance_type          = "t2.micro"
   availability_zone      = "us-east-1a"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-1.id
-  user_data              = "${file("ec2.sh")}"
+  key_name      		     = "developer"
 
   tags = {
     Name = "Web Server"
   }
+  
+  provisioner "remote-exec" {
+    inline = ["echo 'Wait until SSH is ready'"]
 
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("./developer")
+      host        = self.public_ip
+    }
+  }
+  provisioner "local-exec" {
+    command = "ansible-playbook  -i ${aws_instance.webserver1.public_ip}, --private-key ${var.privatekey} play.yml"
+  }
 }
 
 resource "aws_instance" "webserver2" {
@@ -131,13 +155,27 @@ resource "aws_instance" "webserver2" {
   availability_zone      = "us-east-1b"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-2.id
-  user_data              = "${file("ec2.sh")}"
+  key_name      		     = "developer"
 
   tags = {
     Name = "Web Server"
   }
+  
+  provisioner "remote-exec" {
+    inline = ["echo 'Wait until SSH is ready'"]
 
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("./developer")
+      host        = self.public_ip
+    }
+  }
+  provisioner "local-exec" {
+    command = "ansible-playbook  -i ${aws_instance.webserver2.public_ip}, --private-key ${var.privatekey} play.yml"
+  }
 }
+
 
 # Create Web Security Group
 resource "aws_security_group" "web-sg" {
