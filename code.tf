@@ -110,43 +110,19 @@ resource "aws_route_table_association" "b" {
   route_table_id = aws_route_table.web-rt.id
 }
 
-
-
 #Create EC2 Instance
-
 resource "aws_instance" "webserver1" {
   ami                    = "ami-026b57f3c383c2eec"
   instance_type          = "t2.micro"
   availability_zone      = "us-east-1a"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-1.id
-  # key_name               = "developer1.pem"
+  user_data              = "${file("ec2.sh")}"
 
   tags = {
     Name = "Web Server"
   }
-}
 
-resource "null_resource" "copy_execute" {
-
-  connection {
-    type        = "ssh"
-    host        = aws_instance.webserver1.public_ip
-    user        = "ec2-user"
-    private_key = file("developer1.pem")
-  }
-  provisioner "file" {
-    source      = "ec2.sh"
-    destination = "/tmp/ec2.sh"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo chmod 777 /tmp/ec2.sh",
-      "sh /tmp/ec2.sh",
-    ]
-  }
-
-  depends_on = [ aws_instance.webserver1 ]
 }
 
 resource "aws_instance" "webserver2" {
@@ -155,35 +131,13 @@ resource "aws_instance" "webserver2" {
   availability_zone      = "us-east-1b"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-2.id
-  # key_name               = "developer1.pem"
+  user_data              = "${file("ec2.sh")}"
 
   tags = {
     Name = "Web Server"
   }
+
 }
-
-resource "null_resource" "copy_execute1" {
-
-  connection {
-    type        = "ssh"
-    host        = aws_instance.webserver2.public_ip
-    user        = "ec2-user"
-    private_key = file("developer1.pem")
-  }
-  provisioner "file" {
-    source      = "ec2.sh"
-    destination = "/tmp/ec2.sh"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo chmod 777 /tmp/ec2.sh",
-      "sh /tmp/ec2.sh",
-    ]
-  }
-
-  depends_on = [ aws_instance.webserver2 ]
-}
-
 
 # Create Web Security Group
 resource "aws_security_group" "web-sg" {
@@ -195,14 +149,6 @@ resource "aws_security_group" "web-sg" {
     description = "HTTP from VPC"
     from_port   = 80
     to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "HTTP from VPC"
-    from_port   = 22
-    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -237,14 +183,6 @@ resource "aws_security_group" "webserver-sg" {
     description     = "Allow traffic from web layer"
     from_port       = 80
     to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web-sg.id]
-  }
-
-  ingress {
-    description     = "Allow traffic from web layer"
-    from_port       = 22
-    to_port         = 22
     protocol        = "tcp"
     security_groups = [aws_security_group.web-sg.id]
   }
