@@ -140,7 +140,7 @@ resource "aws_instance" "webserver1" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = file("./developer")
+      private_key = file("developer.pem")
       host        = self.public_ip
     }
   }
@@ -167,7 +167,7 @@ resource "aws_instance" "webserver2" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = file("./developer")
+      private_key = file("developer.pem")
       host        = self.public_ip
     }
   }
