@@ -200,11 +200,11 @@ resource "aws_security_group" "web-sg" {
   }
 
   ingress {
-    description     = "Allow traffic from web layer"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web-sg.id]
+    description = "HTTP from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
