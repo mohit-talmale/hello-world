@@ -124,6 +124,22 @@ resource "aws_instance" "webserver1" {
   }
 
 }
+resource "null_resource" "reboo_instance" {
+
+  provisioner "local-exec" {
+    on_failure  = "fail"
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<EOT
+        echo -e "\x1B[31m Warning! Restarting instance having id ${aws_instance.webserver1.id}.................. \x1B[0m"
+        aws ec2 reboot-instances --instance-ids ${aws_instance.webserver1.id}
+        echo "***************************************Rebooted****************************************************"
+     EOT
+  }
+		# this setting will trigger script every time,change it something needed
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
 
 resource "aws_instance" "webserver2" {
   ami                    = "ami-026b57f3c383c2eec"
@@ -139,6 +155,22 @@ resource "aws_instance" "webserver2" {
 
 }
 
+resource "null_resource" "reboo_instance1" {
+
+  provisioner "local-exec" {
+    on_failure  = "fail"
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<EOT
+        echo -e "\x1B[31m Warning! Restarting instance having id ${aws_instance.webserver2.id}.................. \x1B[0m"
+        aws ec2 reboot-instances --instance-ids ${aws_instance.webserver2.id}
+        echo "***************************************Rebooted****************************************************"
+     EOT
+  }
+		# this setting will trigger script every time,change it something needed
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
 # Create Web Security Group
 resource "aws_security_group" "web-sg" {
   name        = "Web-SG"
