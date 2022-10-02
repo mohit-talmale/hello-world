@@ -17,7 +17,7 @@ provider "aws" {
   region = "us-east-1"
 }
 provider "docker" {
-    host     = "ssh://ec2-user@output.public_ip.value2:22"
+    host     = "ssh://ec2-user@output.public_ip.value:22"
     ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
   }
 
@@ -34,7 +34,7 @@ provider "docker" {
   }
 
    provider "docker" {
-    host     = "ssh://ec2-user@output.public_ip.value1:22"
+    host     = "ssh://ec2-user@output.public_ip.value:22"
     ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
   }
   resource "docker_image" "demoimage1" {
