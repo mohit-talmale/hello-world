@@ -16,7 +16,38 @@ terraform {
 provider "aws" {
   region = "us-east-1"
 }
+provider "docker" {
+    host     = "ssh://ec2-user@output.public_ip.value2:22"
+    ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
+  }
 
+  resource "docker_image" "demoimage2" {
+    name = "mohit1talmale/demo-project:newtag2"
+  }
+  resource "docker_container" "foo2" {
+    image = docker_image.demoimage2.name
+    name  = "foo2"
+    ports {
+      external = 8080
+      internal = 80
+    }
+  }
+
+   provider "docker" {
+    host     = "ssh://ec2-user@output.public_ip.value1:22"
+    ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
+  }
+  resource "docker_image" "demoimage1" {
+    name = "mohit1talmale/demo-project:newtag2"
+  }
+  resource "docker_container" "foo1" {
+    image = docker_image.demoimage1.name
+    name  = "foo1"
+    ports {
+      external = 8080
+      internal = 80
+    }
+  }
 
 # Create a VPC
 resource "aws_vpc" "my-vpc" {
@@ -127,24 +158,8 @@ resource "aws_instance" "webserver1" {
   tags = {
     Name = "Web Server"
   }
-  output "public_ip" {
-    value1 = try(aws_instance.webserver1.public_ip, "")
-  }
-  provider "docker" {
-    host     = "ssh://ec2-user@output.public_ip.value1:22"
-    ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
-  }
-  resource "docker_image" "demoimage1" {
-    name = "mohit1talmale/demo-project:newtag2"
-  }
-  resource "docker_container" "foo1" {
-    image = docker_image.demoimage1.name
-    name  = "foo1"
-    ports {
-      external = 8080
-      internal = 80
-    }
-  }
+  
+ 
 }
 
 
@@ -159,25 +174,8 @@ resource "aws_instance" "webserver2" {
   tags = {
     Name = "Web Server"
   }
-  output "public_ip" {
-    value2 = try(aws_instance.webserver2.public_ip, "")
-  }
-  provider "docker" {
-    host     = "ssh://ec2-user@output.public_ip.value2:22"
-    ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
-  }
-
-  resource "docker_image" "demoimage2" {
-    name = "mohit1talmale/demo-project:newtag2"
-  }
-  resource "docker_container" "foo2" {
-    image = docker_image.demoimage2.name
-    name  = "foo2"
-    ports {
-      external = 8080
-      internal = 80
-    }
-  }
+  
+  
 
 }
 
