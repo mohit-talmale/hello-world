@@ -1,10 +1,7 @@
 #!/bin/bash
 
-sudo su -
-yum update -y
-yum install docker -y
-service docker start
-docker rmi mohit1talmale/demo-project:newtag2
-docker login -u mohit1talmale -p Bunty@171
-docker pull mohit1talmale/demo-project:newtag2
-docker run -p 80:8080 mohit1talmale/demo-project:newtag2
+sudo yum update -y
+sudo yum install docker -y
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+
