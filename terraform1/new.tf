@@ -7,9 +7,9 @@ terraform {
   }
 }
 
-provider "docker" {
-  #   host = "unix:///var/run/docker.sock"
-}
+# provider "docker" {
+#   #   host = "unix:///var/run/docker.sock"
+# }
 
 resource "docker_image" "demoimage1" {
   name = "mohit1talmale/demo-project:newtag2"
