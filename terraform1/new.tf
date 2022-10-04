@@ -8,17 +8,17 @@ terraform {
 }
 
 provider "docker" {
-#   host = "unix:///var/run/docker.sock"
+  #   host = "unix:///var/run/docker.sock"
 }
 
 resource "docker_image" "demoimage1" {
-    name = "mohit1talmale/demo-project:newtag2"
+  name = "mohit1talmale/demo-project:newtag2"
+}
+resource "docker_container" "foo1" {
+  image = docker_image.demoimage1.name
+  name  = "foo1"
+  ports {
+    external = 8080
+    internal = 80
   }
-  resource "docker_container" "foo1" {
-    image = docker_image.demoimage1.name
-    name  = "foo1"
-    ports {
-      external = 8080
-      internal = 80
-    }
-  }
+}
