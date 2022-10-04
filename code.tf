@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.0"
     }
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "2.22.0"
-    }
   }
 }
 
@@ -16,10 +12,6 @@ terraform {
 provider "aws" {
   region = "us-east-1"
 }
-provider "docker" {
-}
-
- 
 
 # Create a VPC
 resource "aws_vpc" "my-vpc" {
@@ -125,23 +117,12 @@ resource "aws_instance" "webserver1" {
   availability_zone      = "us-east-1a"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-1.id
-  user_data              = file("ec2.sh")
+  user_data              = "${file("ec2.sh")}"
 
   tags = {
     Name = "Web Server"
   }
-  
-  resource "docker_image" "demoimage1" {
-    name = "mohit1talmale/demo-project:newtag2"
-  }
-  resource "docker_container" "foo1" {
-    image = docker_image.demoimage1.name
-    name  = "foo1"
-    ports {
-      external = 8080
-      internal = 80
-    }
-  }
+
 }
 
 
@@ -151,24 +132,11 @@ resource "aws_instance" "webserver2" {
   availability_zone      = "us-east-1b"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-2.id
-  user_data              = file("ec2.sh")
+  user_data              = "${file("ec2.sh")}"
 
   tags = {
     Name = "Web Server"
   }
-  resource "docker_image" "demoimage2" {
-    name = "mohit1talmale/demo-project:newtag2"
-  }
-  resource "docker_container" "foo2" {
-    image = docker_image.demoimage2.name
-    name  = "foo2"
-    ports {
-      external = 8080
-      internal = 80
-    }
-  }
-
-  
 
 }
 
