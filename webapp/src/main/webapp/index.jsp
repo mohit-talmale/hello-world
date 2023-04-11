@@ -44,7 +44,7 @@ What genre of movies do you like?
 <!--Select box lets you choose one of the multiple dropdown options-->
 <select name="moviepref" ><option>
 <option value=1 selected = "true">comedy
-<option value=2 >romance
+<option value=2 >romance111
 <option value=3 >thriller
 <option value=4 >horror
 <option value=5 >biopic
