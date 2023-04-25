@@ -35,7 +35,7 @@ Do you exercise at home?
 How do you like to read about your favorite topics?
 <p>
 <!--Checkbox lets you select multiple options -->
-<input type="checkbox" name="Books">Books
+<input type="checkbox" name="Books">books1
 <input type="checkbox" name="Web">Online resources
 <input type="checkbox" name="Phone">Phone apps
 <input type="checkbox" name="Magazines">Magazines
